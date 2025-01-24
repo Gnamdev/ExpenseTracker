@@ -8,16 +8,19 @@ public class Expense {
 
     private Double amount;
 
+    private String category;
+
 
    public Expense(){
 
    }
 
-    public Expense(Integer id, String date, String description, Double amount) {
+    public Expense(Integer id, String date, String description, Double amount, String category) {
         this.id = id;
         this.date = date;
         this.description = description;
         this.amount = amount;
+        this.category = category;
     }
 
     public Integer getId() {
@@ -30,6 +33,14 @@ public class Expense {
 
     public String getDate() {
         return date;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public void setDate(String date) {
@@ -52,14 +63,16 @@ public class Expense {
         this.amount = amount;
     }
 
+
+
     @Override
     public String toString() {
-        return "Expense{" +
-                "id=" + id +
+        return "Expense -> id=" + id +
                 ", date='" + date + '\'' +
                 ", description='" + description + '\'' +
                 ", amount=" + amount +
-                '}';
+                ", category='" + category + '\n';
     }
+
 
 }

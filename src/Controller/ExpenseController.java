@@ -1,5 +1,7 @@
 package Controller;
 
+import Reposistory.ExpenseRepository;
+import Reposistory.ExpenseRepositoryImpl;
 import Service.ExpenseService;
 import Service.Impl.ExpenseServiceImpl;
 
@@ -7,20 +9,32 @@ import java.util.Scanner;
 
 public class ExpenseController {
     private final ExpenseService expenseService = new ExpenseServiceImpl();
+    private final ExpenseRepository  expenseRepository = new ExpenseRepositoryImpl();
     private final Scanner scanner = new Scanner(System.in);
 
     public void addExpense() {
-        System.out.print("Enter description: ");
-        String description = scanner.nextLine();
+        Scanner sc = new Scanner(System.in);
+    boolean b =false;
+        String categories = null;
+        do {
+            System.out.print("Enter categories: ");
+            categories = sc.nextLine();
+            if(!categories.isBlank()) b = true;
+        }while (!b);
+        System.out.println("add new expense ");
 
-        System.out.print("Enter amount: ");
+        System.out.println("Enter description: ");
+        String description = scanner.nextLine(); //optional
+
+        System.out.println("Enter amount: ");
         Double amount = scanner.nextDouble();
 
-        System.out.print("Enter date (DD-MM-YYYY): ");
-        String date = scanner.next();
-        scanner.nextLine();
 
-        expenseService.addExpense(amount , description , date );
+        System.out.println("Enter date (DD-MM-YYYY): ");
+        String date = scanner.next();
+
+
+        expenseService.addExpense(amount , description , date , categories );
     }
 
     public void editExpense() {
@@ -33,11 +47,15 @@ public class ExpenseController {
 
         System.out.print("Enter new amount: ");
         Double amount = scanner.nextDouble();
+
+        System.out.print("Enter categories: ");
+
+        String  categories = scanner.nextLine();
         System.out.print("Enter new date (DD-MM-YYYY): ");
         String date = scanner.next();
         scanner.nextLine();
 
-        expenseService.editExpense(id , amount, description , date);
+        expenseService.editExpense(id , amount, description , date, categories);
     }
 
     public void deleteExpense() {
@@ -55,14 +73,44 @@ public class ExpenseController {
         String month = scanner.next();
         expenseService.viewMonthlyReport(month);
     }
-    public void viewMonthlyAndYearBasisReport(String month , String year ){
-        System.out.print("Enter month and year (YYYY-MM): ");
+    public void viewMonthlyAndYearBasisReport( ){
+        System.out.print("Enter month and year (MM-YYYY): ");
+        System.out.println();
+
         System.out.println("month : ");
         String m = scanner.next();
         System.out.println("Year : ");
-        String y = scanner.nextLine();
+        String y = scanner.next();
 
         expenseService.viewMonthlyAndYearBasisReport(m , y);
 
+    }
+
+    public void viewAllCategories(){
+      expenseService.viewAllCategories();
+
+    }
+    public void searchExpenseById(){
+
+        System.out.println("Enter Expense ID:");
+        Integer id = scanner.nextInt();
+
+      expenseService.searchExpenseById(id);
+
+    }
+    public void viewReportByCategories(){
+
+        System.out.println("Enter Expense Category:");
+        String category = scanner.nextLine();
+
+      expenseService.viewCategoriesBasisReport(category);
+
+    }
+
+    public void saveExpenseToLocal(){
+        expenseRepository.uploadFileToLocal();
+    }
+    public void viewAllSaveData(){
+        expenseRepository.getExpenseFromLocal();
     }
 }

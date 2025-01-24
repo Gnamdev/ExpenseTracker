@@ -2,7 +2,9 @@ package FilesUtilles;
 
 import Model.Expense;
 
+import java.util.List;
+
 public interface FilesHelper {
-    void uploadFileToLocalFile(Expense expense);
-    void getExpenseFromLocalFile();
+    void uploadFileToLocal(List<Expense> list);
+ void   getExpenseFromLocal();
 }

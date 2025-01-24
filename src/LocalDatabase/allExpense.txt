@@ -1,0 +1,2 @@
+Expense -> id=115, date='12-01-2025', description='my gym fee', amount=2000.0, category='gym
+Expense -> id=292, date='12-05-2034', description='', amount=1234.0, category='

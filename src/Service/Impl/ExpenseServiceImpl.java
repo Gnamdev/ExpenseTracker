@@ -1,6 +1,8 @@
 package Service.Impl;
 
 import ExceptionHandling.ExpenseTrackerException;
+import FilesUtilles.FilesHelper;
+import FilesUtilles.FilesHelperImpl;
 import Reposistory.ExpenseRepository;
 import Model.Expense;
 import Reposistory.ExpenseRepositoryImpl;
@@ -14,7 +16,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     private final ExpenseRepository expenseRepository = new ExpenseRepositoryImpl();
 
     @Override
-    public void addExpense(Double amount, String description, String date) {
+    public void addExpense(Double amount, String description, String date ,String categories) {
 
 
         Expense expense = new Expense();
@@ -22,6 +24,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         expense.setAmount(amount);
         expense.setDate(date);
         expense.setDescription(description);
+        expense.setCategory(categories);
 
         //save
 
@@ -35,9 +38,9 @@ public class ExpenseServiceImpl implements ExpenseService {
         return  new Random().nextInt(1001);
     }
     @Override
-    public void editExpense(Integer id, Double amount, String description, String date) {
+    public void editExpense(Integer id, Double amount, String description, String date,String categories) {
 
-        boolean editExpense = expenseRepository.editExpense(id, description, amount, date);
+        boolean editExpense = expenseRepository.editExpense(id, description, amount, date, categories);
         if (editExpense){
             System.out.println("Expense updated successfully!");
         } else {
@@ -68,18 +71,30 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public void viewMonthlyReport(String month) {
-
-        Double totalExpenseForMonth =
-                expenseRepository.getTotalExpenseForMonth(month);
+        expenseRepository.getTotalExpenseForMonth(month);
     }
 
     @Override
     public void viewMonthlyAndYearBasisReport(String month, String year) {
-
+        expenseRepository.viewMonthlyAndYearBasisReport(month,year);
     }
 
     @Override
-    public void viewMonthlyAndYearAndCategoriesBasisReport(String categories, String month, String year) {
-
+    public void viewCategoriesBasisReport(String categories) {
+        expenseRepository.viewCategoriesBasisReport(categories);
     }
+
+    @Override
+    public void viewAllCategories() {
+        expenseRepository.viewAllCategories();
+    }
+
+    @Override
+    public void searchExpenseById(Integer id) {
+        expenseRepository.searchExpenseById(id);
+    }
+
+
+
+
 }
