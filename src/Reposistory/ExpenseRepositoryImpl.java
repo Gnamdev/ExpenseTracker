@@ -1,10 +1,13 @@
 package Reposistory;
 
+import Dto.ExpenseDTO;
 import ExceptionHandling.ExpenseTrackerException;
+import ExpenseConstant.ExpenseConstant;
 import FilesUtilles.FilesHelper;
 import FilesUtilles.FilesHelperImpl;
 import Model.Expense;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,27 +25,42 @@ public class ExpenseRepositoryImpl implements ExpenseRepository{
     @Override
     public void addExpense(Expense expense) {
         list.add(expense);
+        filesHelper.uploadFileToLocal(list);
     }
 
     @Override
-    public boolean editExpense(Integer id, String description, Double amount, String date , String categories) {
+    public boolean editExpense(Integer id, ExpenseDTO expenseDTO) {
 
-        return list.stream()
+        Expense expenseToEdit = list.stream()
                 .filter(exp -> exp.getId().equals(id))
                 .findFirst()
-                .map(exp -> {
-                    exp.setDate(date);
-                    exp.setDescription(description);
-                    exp.setAmount(amount);
-                    exp.setCategory(categories);
-                    return true;
-                })
-                .orElse(false);
+                .orElse(null);
+
+        if (expenseToEdit != null) {
+
+            expenseToEdit.setDate(expenseDTO.getDate());
+            expenseToEdit.setDescription(expenseDTO.getDescription());
+            expenseToEdit.setAmount(expenseDTO.getAmount());
+            expenseToEdit.setCategory(expenseDTO.getCategory());
+
+
+            filesHelper.uploadFileToLocal(list);
+            return true;
+        }
+
+        return false;
+
     }
 
     @Override
     public boolean deleteExpense(Integer id) {
-        return list.removeIf(expense -> expense.getId().equals(id));
+        boolean b = list.removeIf(expense -> expense.getId().equals(id));
+
+        if (b) {
+            filesHelper.uploadFileToLocal(list);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -53,54 +71,104 @@ public class ExpenseRepositoryImpl implements ExpenseRepository{
     @Override
     public void getTotalExpenseForMonth(String month) {
         Double total = 0.0;
+        System.out.println("+--------------------------------------------------------------+");
+        System.out.println("|                  Monthly Report                              |");
+        System.out.println("+--------------------------------------------------------------+");
+
 
         if (list.isEmpty()){
             System.out.println("Total Expense: 0 " + " , please add some expense !");
             System.out.println("Total Amount: 0.0");
+            return;
         }
+
+        // Print table headers
+        System.out.printf("| %-10s | %-10s | %-23s | %-16s | %-16s |%n", "ID", "Date", "Description", "Amount", "Category");
+        System.out.println("   +------------+------------+-------------------------+------------------+------------------+");
+
+
+
         for(Expense expense: list){
             if(expense.getDate().substring(3,5).equals(month)){
-                System.out.println("Total Expense: "+expense);
+
+                System.out.printf("| %-10d | %-10s | %-23s | %-16.2f | %-16s |%n",
+                        expense.getId(),
+                        expense.getDate(),
+                        expense.getDescription(),
+                        expense.getAmount(),
+                        expense.getCategory());
                 total += expense.getAmount();
-                System.out.println("Total Amount: "+total);
+
+
             }
         }
+        System.out.println("Total Amount: "+total);
 
     }
 
     @Override
     public void viewMonthlyAndYearBasisReport(String month, String year) {
         Double total = 0.0;
+        System.out.println("+--------------------------------------------------------------+");
+        System.out.println("|             MonthlyAndYearBasis Report                        |");
+        System.out.println("+--------------------------------------------------------------+");
 
         if (list.isEmpty()){
             System.out.println("Total Expense: 0 " + " , please add some expense !");
             System.out.println("Total Amount: 0.0");
         }
 
+        // Print table headers
+        System.out.printf("| %-10s | %-10s | %-23s | %-16s | %-16s |%n", "ID", "Date", "Description", "Amount", "Category");
+        System.out.println("   +------------+------------+-------------------------+------------------+------------------+");
+
+
 
         for(Expense expense: list){
             if(expense.getDate().substring(3,5).equals(month)
             && expense.getDate().substring(6,10).equals(year)){
-                System.out.println("Total Expense: "+expense);
+                System.out.printf("| %-10d | %-10s | %-23s | %-16.2f | %-16s |%n",
+                        expense.getId(),
+                        expense.getDate(),
+                        expense.getDescription(),
+                        expense.getAmount(),
+                        expense.getCategory());
                 total += expense.getAmount();
-                System.out.println("Total Amount: "+total);
+
+
             }
         }
+        System.out.println("Total Amount -->  "+total);
     }
 
     @Override
     public void viewCategoriesBasisReport(String categories) {
 
+        System.out.println("+--------------------------------------------------------------+");
+        System.out.println("|                Categories  Basis Report                      |");
+        System.out.println("+--------------------------------------------------------------+");
 
 
-         list.stream()
-                .filter(exe -> exe.getCategory().equals(categories))
-                .forEach(System.out::println);
+        // Print table headers
+        System.out.printf("| %-10s | %-10s | %-23s | %-16s | %-16s |%n", "ID", "Date", "Description", "Amount", "Category");
+        System.out.println("+------------+------------+-------------------------+------------------+------------------+");
+
+
+        list.stream()
+                .filter(exe -> exe.getCategory().equalsIgnoreCase(categories))
+                .forEach(expense -> {
+                    System.out.printf("| %-10d | %-10s | %-23s | %-16.2f | %-16s |%n",
+                            expense.getId(),
+                            expense.getDate(),
+                            expense.getDescription(),
+                            expense.getAmount(),
+                            expense.getCategory());
+                });
 
          System.out.println();
 
         double totalExpenseAmount = list.stream()
-                .filter(exe -> exe.getCategory().equals(categories))
+                .filter(exe -> exe.getCategory().equalsIgnoreCase(categories))
                 .mapToDouble(Expense::getAmount)
                 .sum();
 
@@ -118,23 +186,32 @@ public class ExpenseRepositoryImpl implements ExpenseRepository{
 
         list.stream()
                  .map(Expense::getCategory)
-                 .forEach(System.out::println);
+                 .forEach(cat -> {
+                     System.out.println(" ==> " + cat);
+                 });
 
     }
 
     @Override
     public void searchExpenseById(Integer id) {
-       list.stream()
+        // Print table headers
+        System.out.printf("| %-10s | %-10s | %-23s | %-16s | %-16s |%n", "ID", "Date", "Description", "Amount", "Category");
+        System.out.println("+------------+------------+-------------------------+------------------+------------------+");
+
+        list.stream()
                .filter(exe -> exe.getId().equals(id))
-               .forEach(System.out::println);
+               .forEach(expense -> {
+                   System.out.printf("| %-10d | %-10s | %-23s | %-16.2f | %-16s |%n",
+                           expense.getId(),
+                           expense.getDate(),
+                           expense.getDescription(),
+                           expense.getAmount(),
+                           expense.getCategory());
+
+               });
     }
 
-    public void uploadDataToLocal(){
-        filesHelper.uploadFileToLocal(list);
-    }
-    public void getAllExpenseToFile(){
-        filesHelper.getExpenseFromLocal();
-    }
+
 
     @Override
     public void uploadFileToLocal() {
@@ -145,5 +222,11 @@ public class ExpenseRepositoryImpl implements ExpenseRepository{
     @Override
     public void getExpenseFromLocal() {
         filesHelper.getExpenseFromLocal();
+    }
+
+    public static void loadDataAtTimeOfProgramStart(){
+
+        List<Expense> expenses = FilesHelperImpl.fetchExpensesFromFile(ExpenseConstant.LOCAL_PATH);
+        list.addAll(expenses);
     }
 }

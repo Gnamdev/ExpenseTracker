@@ -1,13 +1,14 @@
 package Service;
 
+import Dto.ExpenseDTO;
 import Model.Expense;
 
 import java.util.List;
 
 public interface ExpenseService {
 
-    void addExpense(Double amount , String description , String date  ,String categories );
-    void editExpense(Integer id , Double amount , String description , String date,String categories);
+    void addExpense(ExpenseDTO expenseDTO);
+    void editExpense(Integer id , ExpenseDTO expenseDTO);
     void deleteExpense(Integer id);
 
     void viewAllExpenses();

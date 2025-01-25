@@ -65,13 +65,21 @@ public class Expense {
 
 
 
+//    @Override
+//    public String toString() {
+//        return "Expense -> id=" + id +
+//                ", date='" + date + '\'' +
+//                ", description='" + description + '\'' +
+//                ", amount=" + amount +
+//                ", category='" + category + '\n';
+//    }
+
     @Override
     public String toString() {
-        return "Expense -> id=" + id +
-                ", date='" + date + '\'' +
-                ", description='" + description + '\'' +
-                ", amount=" + amount +
-                ", category='" + category + '\n';
+        // Column formatting for table-like structure
+        String format = "| %-10s | %-10s | %-23s | %-16s | %-16s |";
+
+        return String.format(format, id, date, description, amount, category);
     }
 
 
